@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monopoly Money Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-container">
+        <a class="logo" href="#">Monopoly Money Tracker</a>
+        <nav class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#flows">Flows</a>
+          <a href="#technology">Technology</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <button class="cta-button" data-scroll="contact">Request Access</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-content">
+          <div class="hero-copy">
+            <span class="badge">Mobile-first PWA</span>
+            <h1>Keep Every Monopoly Dollar Accounted For.</h1>
+            <p>
+              Monopoly Money Tracker is the real-time ledger built for fast,
+              fair, and fun board game nights. Create a game, invite friends in
+              seconds, and manage every transaction with confidence.
+            </p>
+            <div class="hero-actions">
+              <button class="cta-button" data-scroll="features">Explore Features</button>
+              <button class="ghost-button" data-scroll="technology">See How It Works</button>
+            </div>
+            <ul class="trust-points">
+              <li>Instant balance clarity</li>
+              <li>Immutable audit trail</li>
+              <li>Works on any device</li>
+            </ul>
+          </div>
+          <div class="hero-visual">
+            <div class="card-grid">
+              <article class="card">
+                <h3>Live Balances</h3>
+                <p>Track every player's cash and the last action at a glance.</p>
+              </article>
+              <article class="card">
+                <h3>Smart Approvals</h3>
+                <p>Require banker or group confirmation before funds move.</p>
+              </article>
+              <article class="card">
+                <h3>Push Notifications</h3>
+                <p>Stay informed the moment money changes hands.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="section">
+        <div class="container">
+          <div class="section-heading">
+            <span class="badge">Why players love it</span>
+            <h2>Designed for fast, fair play from lobby to final tally.</h2>
+            <p>
+              A streamlined interface covers every Monopoly cash move, with
+              approvals and notifications keeping everyone in sync.
+            </p>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <h3>Effortless Game Setup</h3>
+              <p>
+                Launch a session with presets for rules, starting cash, and
+                currency. Share a QR code or short code to invite players in
+                seconds.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>Live Balances Dashboard</h3>
+              <p>
+                A responsive grid keeps every player’s avatar, balance, and
+                latest delta front and center. Sort by richest or poorest and
+                search instantly.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>Money Actions &amp; Shortcuts</h3>
+              <p>
+                Add, deduct, pay another player, or tap quick actions for Pass
+                GO, chance, chest, fines, and more—right from the dashboard.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>Immutable Activity Log</h3>
+              <p>
+                See initiators, approvals, before/after balances, and notes for
+                every transaction. Undo safely with automatic reversal entries.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>Role-Based Safety</h3>
+              <p>
+                Banker lock mode, approval rules, session PINs, and rate limits
+                stop cheating before it starts.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>Always in the Loop</h3>
+              <p>
+                Real-time toasts and push notifications keep the table informed
+                about transfers, approvals, and game state changes.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section accent">
+        <div class="container split">
+          <div>
+            <span class="badge">Game lifecycle</span>
+            <h2>Built to follow every stage of play.</h2>
+            <p>
+              Monopoly Money Tracker mirrors the board game lifecycle so nothing
+              slips through the cracks.
+            </p>
+            <ul class="checklist">
+              <li>Create → Join → Ready with QR and short codes.</li>
+              <li>Running games get live updates, approvals, and push alerts.</li>
+              <li>Pause for breaks, then resume with a single tap.</li>
+              <li>End with standings, charts, and exportable summaries.</li>
+            </ul>
+          </div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <span class="timeline-step">1</span>
+              <div>
+                <h3>Create &amp; Share</h3>
+                <p>Host sets rules, starting cash, and shares QR/link.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-step">2</span>
+              <div>
+                <h3>Play in Real Time</h3>
+                <p>Banker approvals and live balances keep everyone aligned.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-step">3</span>
+              <div>
+                <h3>Audit &amp; Undo</h3>
+                <p>Every move is logged with before/after snapshots.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-step">4</span>
+              <div>
+                <h3>Celebrate the Win</h3>
+                <p>Export standings, share highlights, and rematch instantly.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="flows" class="section">
+        <div class="container">
+          <div class="section-heading">
+            <span class="badge">Key UX flows</span>
+            <h2>Clear journeys for bankers, players, and spectators.</h2>
+          </div>
+          <div class="flow-grid">
+            <article class="flow-card">
+              <h3>Launch a Game</h3>
+              <p>
+                Set up a session with presets, display a QR for the table, and
+                see players pop in as they join via code or invite link.
+              </p>
+            </article>
+            <article class="flow-card">
+              <h3>Approve a Transfer</h3>
+              <p>
+                Snapshots show before/after balances so bankers can approve or
+                reject in a tap—trust restored instantly.
+              </p>
+            </article>
+            <article class="flow-card">
+              <h3>Late Join Recovery</h3>
+              <p>
+                New players sync past activity, current balances, and
+                notifications within seconds of joining.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="technology" class="section accent">
+        <div class="container">
+          <div class="section-heading">
+            <span class="badge">Tech stack</span>
+            <h2>Reliable architecture with realtime at its core.</h2>
+            <p>
+              Pairing a modern PWA frontend with a realtime event-sourced
+              backend keeps the experience fast, synchronized, and auditable.
+            </p>
+          </div>
+          <div class="tech-grid">
+            <article class="tech-card">
+              <h3>Frontend</h3>
+              <ul>
+                <li>React + Vite PWA</li>
+                <li>Tailwind CSS and i18next</li>
+                <li>IndexedDB caching for offline resilience</li>
+              </ul>
+            </article>
+            <article class="tech-card">
+              <h3>Backend</h3>
+              <ul>
+                <li>NestJS API with PostgreSQL + Prisma</li>
+                <li>Redis pub/sub for realtime rooms</li>
+                <li>Event-sourced ledger for auditability</li>
+              </ul>
+            </article>
+            <article class="tech-card">
+              <h3>Realtime &amp; Notifications</h3>
+              <ul>
+                <li>Socket.io channels per game</li>
+                <li>Web Push (VAPID), FCM, and APNs adapters</li>
+                <li>Optimistic UI with server reconciliation</li>
+              </ul>
+            </article>
+            <article class="tech-card">
+              <h3>Security &amp; Safety</h3>
+              <ul>
+                <li>Scoped tokens &amp; role-based permissions</li>
+                <li>Rate limiting and banker lock mode</li>
+                <li>Auto-purge ended games for privacy</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container split">
+          <div>
+            <span class="badge">Beyond the MVP</span>
+            <h2>Roadmap highlights for the future.</h2>
+            <p>
+              We have a packed backlog of features that take Monopoly Money
+              Tracker from game-night companion to your go-to board game ledger.
+            </p>
+          </div>
+          <ul class="roadmap">
+            <li>Offline/local play via WebRTC peer hosting.</li>
+            <li>House rule presets and theming options.</li>
+            <li>Stats and insights like net flow and top collector.</li>
+            <li>Localization with full RTL layouts.</li>
+            <li>Guest mode plus persistent player history.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="contact" class="section accent">
+        <div class="container contact">
+          <div>
+            <span class="badge">Get started</span>
+            <h2>Bring order to your next Monopoly showdown.</h2>
+            <p>
+              Join the early access list to be the first to play with
+              Monopoly Money Tracker and bring fairness to every game.
+            </p>
+          </div>
+          <form class="contact-form">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" placeholder="Pat Player" required />
+
+            <label for="email">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              required
+            />
+
+            <label for="message">Tell us about your game nights</label>
+            <textarea
+              id="message"
+              name="message"
+              rows="4"
+              placeholder="How many players? Any house rules?"
+            ></textarea>
+
+            <button type="submit" class="cta-button">Request Early Access</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-content">
+        <p>&copy; <span id="year"></span> Monopoly Money Tracker. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="#features">Features</a>
+          <a href="#technology">Technology</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+  </body>
+</html>
