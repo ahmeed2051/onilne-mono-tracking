@@ -30,7 +30,57 @@ const elements = {
   activityTemplate: document.querySelector('#activity-item-template'),
 };
 
-const API_BASE = '/api';
+function normalizeApiBase(base) {
+  if (!base) return '/api';
+  const trimmed = base.toString().trim();
+  if (!trimmed) return '/api';
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed.replace(/\/+$/u, '');
+  }
+  const withoutHash = trimmed.split('#')[0];
+  const withoutQuery = withoutHash.split('?')[0];
+  const stripped = withoutQuery.replace(/^\/+/, '').replace(/\/+$/u, '');
+  if (!stripped) return '/api';
+  return `/${stripped}`;
+}
+
+function resolveApiBase() {
+  const override =
+    (typeof window !== 'undefined' && window.MONOPOLY_API_BASE) ||
+    document.querySelector('meta[name="monopoly-api-base"]')?.getAttribute('content') ||
+    document.body?.dataset?.apiBase;
+  if (override) {
+    return normalizeApiBase(override);
+  }
+
+  let inferredPath = '';
+  try {
+    const script = document.currentScript || document.querySelector('script[src*="scripts.js"]');
+    if (script) {
+      const scriptUrl = new URL(script.src, window.location.href);
+      inferredPath = scriptUrl.pathname.replace(/\/[^/]*$/, '');
+    }
+  } catch (error) {
+    console.warn('Unable to derive API base from script path.', error);
+  }
+
+  if (!inferredPath && typeof window !== 'undefined') {
+    const { pathname } = window.location || { pathname: '' };
+    if (pathname) {
+      inferredPath = pathname.endsWith('/')
+        ? pathname.slice(0, -1)
+        : pathname.replace(/\/[^/]*$/, '');
+    }
+  }
+
+  if (inferredPath) {
+    return normalizeApiBase(`${inferredPath}/api`);
+  }
+
+  return '/api';
+}
+
+const API_BASE = resolveApiBase();
 
 async function apiRequest(path, options = {}) {
   const config = {
@@ -42,9 +92,23 @@ async function apiRequest(path, options = {}) {
   }
 
   const response = await fetch(`${API_BASE}${path}`, config);
-  const data = await response.json().catch(() => ({}));
+  const rawText = await response.text();
+  let data = {};
+  if (rawText) {
+    try {
+      data = JSON.parse(rawText);
+    } catch (error) {
+      data = {};
+    }
+  }
   if (!response.ok) {
-    const errorMessage = data.error || 'Something went wrong.';
+    const fallbackMessage =
+      data.error ||
+      data.message ||
+      response.statusText ||
+      (rawText && rawText.trim()) ||
+      `Request failed with status ${response.status}`;
+    const errorMessage = fallbackMessage || 'Something went wrong.';
     throw new Error(errorMessage);
   }
   return data;
