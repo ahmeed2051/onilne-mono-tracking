@@ -46,6 +46,26 @@
         </section>
 
         <section class="panel">
+          <h2>Join a game</h2>
+          <form id="join-game-form" class="stack" autocomplete="off">
+            <label class="field">
+              <span>Game code</span>
+              <input
+                type="text"
+                id="join-game-code"
+                name="code"
+                placeholder="E.g. A1B2C3"
+                maxlength="10"
+                autocapitalize="characters"
+                required
+              />
+            </label>
+            <button type="submit" class="btn secondary full">Join game</button>
+          </form>
+          <p class="helper-text">Ask the host for the share code to join their session.</p>
+        </section>
+
+        <section class="panel">
           <div class="panel-header">
             <h2>Active games</h2>
             <button type="button" class="btn subtle" id="refresh-games" aria-label="Refresh games">↻</button>
@@ -105,6 +125,7 @@
             <p class="overline">Current game</p>
             <h2 id="game-title"></h2>
             <p class="muted" id="game-meta"></p>
+            <p class="share-code" id="game-share-code" hidden></p>
           </div>
           <div class="overview-stats" id="overview-stats"></div>
         </section>
