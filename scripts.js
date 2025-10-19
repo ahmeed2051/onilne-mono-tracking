@@ -37,6 +37,9 @@ function normalizeApiBase(base) {
   if (/^https?:\/\//i.test(trimmed)) {
     return trimmed.replace(/\/+$/u, '');
   }
+  if (trimmed.startsWith('//')) {
+    return trimmed.replace(/\/+$/u, '');
+  }
   const withoutHash = trimmed.split('#')[0];
   const withoutQuery = withoutHash.split('?')[0];
   const stripped = withoutQuery.replace(/^\/+/, '').replace(/\/+$/u, '');
