@@ -24,6 +24,18 @@ Monopoly Money Tracker is a lightweight full-stack demo that helps you host Mono
 
 The backend keeps data in memory, so stopping the server resets the games. This is intentional for demo purposes and keeps the setup simple.
 
+### Seeing a 405 when creating a game?
+
+That usually means the UI is being served without the accompanying Node backend, so the `POST /api/games` request never reaches the handler in `server.js`.
+
+Run everything from this project’s server so the API and frontend share the same origin:
+
+```bash
+npm start
+```
+
+Then open the URL that prints in the terminal (normally http://localhost:3000) and try the form again—the API will respond with the expected `201` payload. If you must host the static files elsewhere, configure that host to proxy every `/api/*` request back to this Node service so the POST keeps working.
+
 ## Available Scripts
 - `npm start` – run the Node.js server on port 3000.
 - `npm test` – placeholder script; prints a message and exits.
