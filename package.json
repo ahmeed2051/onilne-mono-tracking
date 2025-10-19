@@ -1,0 +1,19 @@
+{
+  "name": "monopoly-money-tracker",
+  "version": "1.0.0",
+  "description": "Full-stack Monopoly money tracking demo application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"No tests specified\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "nanoid": "^5.0.7"
+  }
+}

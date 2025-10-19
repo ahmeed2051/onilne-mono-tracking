@@ -1,38 +1,53 @@
 # Monopoly Money Tracker
 
-Monopoly Money Tracker is a digital ledger for in-person Monopoly games. It keeps player balances in sync across devices, streamlines approvals for complex transactions, and provides a trustworthy audit trail so the table never has to pause to count cash again.
+Monopoly Money Tracker is a lightweight full-stack demo that helps you host Monopoly nights without counting paper cash. Create a
+game, invite players sitting around the table, and record every rent payment, fine, or trade in seconds while everyone watches
+the live balances update.
 
-## Project Overview
-- **Core goals:** deliver instant clarity on balances, maintain a fair audit trail, offer low-friction joining, work across devices, keep updates reliable, and remain completely free to use with no payments required.
-- **Target platforms:** mobile-first progressive web app with optional native wrappers.
-- **Primary users:** bankers, players, and optional spectators joining via QR code, invite link, or short alphanumeric code.
+## Features
+- **Game setup in seconds** – choose a name, starting balance, and currency and you instantly have a lobby ready for players.
+- **Player management** – add players with color-coded avatars and view their balance deltas from the starting cash.
+- **Action logging** – record deposits, withdrawals, and transfers with optional notes; the timeline keeps an immutable audit
+  trail.
+- **Responsive dashboard** – a modern, touch-friendly UI that adapts beautifully from phones to large tabletop displays.
+- **In-memory backend** – Express.js API stores the current server session, keeping the demo fast with zero external services.
 
-For deeper product details, see the [Monopoly Money Tracker Blueprint](docs/monopoly-money-tracker-blueprint.md).
+## Tech Stack
+- **Frontend:** Vanilla JavaScript, semantic HTML, and custom CSS (no framework required).
+- **Backend:** Node.js with Express, CORS, and nanoid for friendly identifiers.
 
-## Key Features
-- **Game creation & joining:** configure rule presets, starting cash, and currency, then invite others via QR code or shareable code.
-- **Live balances dashboard:** real-time grid of players with avatars, balances, and recent deltas, plus quick search and sorting.
-- **Money actions:** add, deduct, or transfer money; trigger Monopoly-specific shortcuts like "Pass GO" or chance/community chest presets.
-- **Approvals workflow:** optional banker or multi-player approvals with undo/redo via inverse transactions.
-- **Activity log:** immutable audit trail with before/after snapshots, notes, and timestamps.
-- **Notifications:** in-app toasts and push notifications for transactions, approvals, and game state changes.
-- **Game lifecycle controls:** pause, resume, and end games with final standings and export options.
+## Getting started
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the development server (serves the API and frontend):
+   ```bash
+   npm start
+   ```
+3. Open http://localhost:3000 in your browser.
 
-## Architecture Snapshot
-- **Frontend:** React/Vite PWA using Tailwind CSS and i18next, with service worker caching and IndexedDB storage for offline resilience.
-- **Backend:** NestJS with PostgreSQL (Prisma ORM) and Redis for real-time presence and pub/sub.
-- **Realtime:** Socket.io channels for game updates, with WebRTC fallback for local/offline play.
-- **Auth & security:** passwordless magic links or guest tokens, scoped session permissions, and rate limiting on critical actions.
-- **Notifications:** Web Push via VAPID plus adapters for FCM/APNs when packaged natively.
+The backend keeps data in memory, so stopping the server resets the games. This is intentional for demo purposes and keeps the
+setup simple.
 
-## Getting Started
-Development scaffolding is not yet checked into this repository. To contribute:
-1. Review the [product blueprint](docs/monopoly-money-tracker-blueprint.md) for domain context and feature expectations.
-2. Propose implementation plans via issues or design docs before submitting large changes.
-3. Once the codebase is available, follow the standard setup instructions for the chosen stack (Node.js, NestJS, PostgreSQL, Redis, and a React/Vite frontend).
+## Available Scripts
+- `npm start` – run the Express server on port 3000.
+- `npm test` – placeholder script; prints a message and exits.
 
-## Roadmap Highlights
-Future iterations may introduce offline/local play, house-rule presets, analytics, localization, and theming improvements. See the blueprint for the full backlog of post-MVP ideas.
+## Project structure
+```
+.
+├── docs/                              # Product background docs
+├── index.html                         # UI shell
+├── scripts.js                         # Frontend logic & API calls
+├── styles.css                         # Modern, responsive styling
+├── server.js                          # Express backend with in-memory store
+└── package.json                       # Dependencies and scripts
+```
+
+## Contributing
+Pull requests are welcome! If you plan a larger change, please open an issue describing your idea first so we can discuss the
+best approach.
 
 ## License
-This project does not yet specify a license. Please open an issue to discuss licensing before reusing or distributing the work.
+MIT
