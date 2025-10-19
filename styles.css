@@ -537,3 +537,28 @@ main {
     scroll-behavior: auto !important;
   }
 }
+
+/* Minimal presentation: keep only interactive elements visible */
+.hero-copy .badge,
+.hero-copy h1,
+.hero-copy p,
+.hero-copy .trust-points,
+.hero-visual,
+.card-grid,
+.section-heading,
+.feature-grid,
+.section.accent .container > :first-child,
+.timeline,
+.flow-grid,
+.tech-grid,
+.roadmap,
+.faq-grid,
+.contact > div,
+.footer-content > p,
+.footer-links {
+  display: none;
+}
+
+.section.accent .container.split {
+  grid-template-columns: 1fr;
+}
