@@ -5,6 +5,8 @@ const state = {
 
 const elements = {
   createGameForm: document.querySelector('#create-game-form'),
+  joinGameForm: document.querySelector('#join-game-form'),
+  joinGameCodeInput: document.querySelector('#join-game-code'),
   addPlayerForm: document.querySelector('#add-player-form'),
   transactionForm: document.querySelector('#transaction-form'),
   playerPanel: document.querySelector('#player-panel'),
@@ -17,6 +19,7 @@ const elements = {
   overviewStats: document.querySelector('#overview-stats'),
   gameTitle: document.querySelector('#game-title'),
   gameMeta: document.querySelector('#game-meta'),
+  gameShareCode: document.querySelector('#game-share-code'),
   playersSection: document.querySelector('#players'),
   playerGrid: document.querySelector('#player-grid'),
   activitySection: document.querySelector('#activity'),
@@ -119,6 +122,10 @@ function renderGame() {
   elements.playersSection.hidden = !hasGame;
   elements.activitySection.hidden = !hasGame;
   elements.emptyState.hidden = hasGame;
+  if (elements.gameShareCode) {
+    elements.gameShareCode.hidden = !hasGame;
+    elements.gameShareCode.innerHTML = '';
+  }
 
   if (!hasGame) {
     elements.playerGrid.innerHTML = '';
@@ -137,6 +144,15 @@ function renderGame() {
     meta.push(`Updated ${timeAgo(updated)}`);
   }
   elements.gameMeta.textContent = meta.join(' • ');
+  if (elements.gameShareCode) {
+    if (game.joinCode) {
+      elements.gameShareCode.hidden = false;
+      elements.gameShareCode.innerHTML = `Share code <span class="share-code__badge">${game.joinCode}</span>`;
+    } else {
+      elements.gameShareCode.hidden = true;
+      elements.gameShareCode.textContent = '';
+    }
+  }
 
   renderStats(game);
   renderPlayers(game);
@@ -371,7 +387,8 @@ function attachEventListeners() {
           currency: payload.currency,
         },
       });
-      showToast('Game created');
+      const shareMessage = game.joinCode ? `Game created. Share code ${game.joinCode}` : 'Game created';
+      showToast(shareMessage);
       state.currentGame = game;
       await loadGames();
       updateGameSelect();
@@ -397,6 +414,36 @@ function attachEventListeners() {
   elements.refreshGame?.addEventListener('click', () => {
     if (state.currentGame) {
       loadGame(state.currentGame.id);
+    }
+  });
+
+  elements.joinGameForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const normalized = (formData.get('code') || '')
+      .toString()
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .toUpperCase();
+    if (!normalized) {
+      showToast('Enter a valid game code.', 'error');
+      return;
+    }
+    if (elements.joinGameCodeInput) {
+      elements.joinGameCodeInput.value = normalized;
+    }
+    try {
+      const { game } = await apiRequest(`/games/code/${encodeURIComponent(normalized)}`);
+      state.currentGame = game;
+      showToast(`Joined ${game.name}`);
+      await loadGames();
+      state.currentGame = game;
+      if (elements.gameSelect) {
+        elements.gameSelect.value = game.id;
+      }
+      renderGame();
+      event.target.reset();
+    } catch (error) {
+      showToast(error.message, 'error');
     }
   });
 

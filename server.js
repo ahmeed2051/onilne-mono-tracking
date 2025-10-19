@@ -15,27 +15,44 @@ function nanoid(size = 10) {
 class GameStore {
   constructor() {
     this.games = new Map();
+    this.codeIndex = new Map();
   }
 
   createGame({ name, startingBalance = 1500, currency = 'M$' }) {
     const id = nanoid(10);
+    const joinCode = this.generateJoinCode();
     const now = new Date().toISOString();
     const game = {
       id,
       name,
       startingBalance,
       currency,
+      joinCode,
       createdAt: now,
       updatedAt: now,
       players: new Map(),
       transactions: [],
     };
     this.games.set(id, game);
+    this.codeIndex.set(joinCode, id);
     return this.serializeGame(game);
   }
 
   getGame(id) {
     const game = this.games.get(id);
+    return game ? this.serializeGame(game) : null;
+  }
+
+  getGameByJoinCode(code) {
+    const normalized = (code || '').toString().trim().toUpperCase();
+    if (!normalized) {
+      return null;
+    }
+    const gameId = this.codeIndex.get(normalized);
+    if (!gameId) {
+      return null;
+    }
+    const game = this.games.get(gameId);
     return game ? this.serializeGame(game) : null;
   }
 
@@ -49,6 +66,7 @@ class GameStore {
       name: game.name,
       startingBalance: game.startingBalance,
       currency: game.currency,
+      joinCode: game.joinCode,
       createdAt: game.createdAt,
       updatedAt: game.updatedAt,
       playerCount: game.players.size,
@@ -165,6 +183,7 @@ class GameStore {
       name: game.name,
       startingBalance: game.startingBalance,
       currency: game.currency,
+      joinCode: game.joinCode,
       createdAt: game.createdAt,
       updatedAt: game.updatedAt,
       players: Array.from(game.players.values()).map((player) => ({
@@ -176,6 +195,20 @@ class GameStore {
       })),
       transactions: game.transactions,
     };
+  }
+
+  generateJoinCode(length = 6) {
+    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    while (true) {
+      const bytes = randomBytes(length);
+      let code = '';
+      for (let i = 0; i < length; i += 1) {
+        code += alphabet[bytes[i] % alphabet.length];
+      }
+      if (!this.codeIndex.has(code)) {
+        return code;
+      }
+    }
   }
 }
 
@@ -314,6 +347,17 @@ async function handleRequest(req, res) {
         sendJson(res, 500, { error: error.message || 'Failed to create game.' });
       }
     }
+    return;
+  }
+
+  const codeMatch = pathname.match(/^\/api\/games\/code\/([^\/]+)$/);
+  if (codeMatch && req.method === 'GET') {
+    const game = store.getGameByJoinCode(codeMatch[1]);
+    if (!game) {
+      sendJson(res, 404, { error: 'Game not found.' });
+      return;
+    }
+    sendJson(res, 200, { game });
     return;
   }
 
