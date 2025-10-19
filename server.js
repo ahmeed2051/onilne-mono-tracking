@@ -1,9 +1,16 @@
-const express = require('express');
-const cors = require('cors');
+const http = require('http');
+const fs = require('fs');
 const path = require('path');
-const { nanoid } = require('nanoid');
+const { randomBytes } = require('crypto');
 
 const PORT = process.env.PORT || 3000;
+
+function nanoid(size = 10) {
+  return randomBytes(size * 2)
+    .toString('base64url')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .slice(0, size) || randomBytes(size).toString('hex').slice(0, size);
+}
 
 class GameStore {
   constructor() {
@@ -174,79 +181,206 @@ class GameStore {
 
 const store = new GameStore();
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+function sendJson(res, statusCode, payload) {
+  if (res.writableEnded) {
+    return;
+  }
+  const body = JSON.stringify(payload);
+  res.writeHead(statusCode, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Content-Length': Buffer.byteLength(body),
+  });
+  res.end(body);
+}
 
-app.get('/api/games', (_req, res) => {
-  res.json({ games: store.listGames() });
-});
+function setCorsHeaders(res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
 
-app.post('/api/games', (req, res) => {
+async function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', (chunk) => {
+      data += chunk;
+      if (data.length > 1e6) {
+        reject(new Error('Request body too large.'));
+        req.destroy();
+      }
+    });
+    req.on('end', () => {
+      if (!data.trim()) {
+        resolve({});
+        return;
+      }
+      try {
+        resolve(JSON.parse(data));
+      } catch (error) {
+        reject(new Error('Invalid JSON body.'));
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
+async function serveStaticFile(res, pathname) {
+  const requestedPath = pathname === '/' ? '/index.html' : pathname;
+  const normalized = path.posix.normalize(requestedPath).replace(/^\.\//, '');
+  if (normalized.includes('..')) {
+    res.writeHead(403);
+    res.end('Forbidden');
+    return;
+  }
+
+  const filePath = path.join(__dirname, normalized);
   try {
-    const { name, startingBalance, currency } = req.body || {};
-    const trimmedName = (name || '').trim();
-    if (!trimmedName) {
-      return res.status(400).json({ error: 'Game name is required.' });
+    const stat = await fs.promises.stat(filePath);
+    if (stat.isDirectory()) {
+      await serveStaticFile(res, path.posix.join(normalized, 'index.html'));
+      return;
     }
-    const numericStartingBalance = Number(startingBalance);
-    const balance = Number.isFinite(numericStartingBalance) && numericStartingBalance >= 0
-      ? numericStartingBalance
-      : 1500;
-    const newGame = store.createGame({ name: trimmedName, startingBalance: balance, currency: currency || 'M$' });
-    res.status(201).json({ game: newGame });
+    const stream = fs.createReadStream(filePath);
+    const ext = path.extname(filePath).toLowerCase();
+    const contentType = {
+      '.html': 'text/html; charset=utf-8',
+      '.css': 'text/css; charset=utf-8',
+      '.js': 'application/javascript; charset=utf-8',
+      '.json': 'application/json; charset=utf-8',
+      '.svg': 'image/svg+xml',
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif',
+    }[ext] || 'application/octet-stream';
+    res.writeHead(200, { 'Content-Type': contentType });
+    stream.pipe(res);
+    stream.on('error', (error) => {
+      console.error('Static file stream error:', error);
+      if (!res.writableEnded) {
+        res.writeHead(500);
+        res.end('Internal Server Error');
+      }
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message || 'Failed to create game.' });
-  }
-});
-
-app.get('/api/games/:gameId', (req, res) => {
-  const { gameId } = req.params;
-  const game = store.getGame(gameId);
-  if (!game) {
-    return res.status(404).json({ error: 'Game not found.' });
-  }
-  res.json({ game });
-});
-
-app.post('/api/games/:gameId/players', (req, res) => {
-  const { gameId } = req.params;
-  try {
-    const updatedGame = store.addPlayer(gameId, req.body || {});
-    if (!updatedGame) {
-      return res.status(404).json({ error: 'Game not found.' });
+    if (error.code === 'ENOENT') {
+      res.writeHead(404);
+      res.end('Not Found');
+      return;
     }
-    res.status(201).json({ game: updatedGame });
-  } catch (error) {
-    res.status(400).json({ error: error.message || 'Failed to add player.' });
+    console.error('Static file error:', error);
+    res.writeHead(500);
+    res.end('Internal Server Error');
   }
-});
+}
 
-app.post('/api/games/:gameId/transactions', (req, res) => {
-  const { gameId } = req.params;
-  try {
-    const updatedGame = store.addTransaction(gameId, req.body || {});
-    if (!updatedGame) {
-      return res.status(404).json({ error: 'Game not found.' });
+async function handleRequest(req, res) {
+  setCorsHeaders(res);
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  const pathname = url.pathname;
+
+  if (pathname === '/api/games' && req.method === 'GET') {
+    sendJson(res, 200, { games: store.listGames() });
+    return;
+  }
+
+  if (pathname === '/api/games' && req.method === 'POST') {
+    try {
+      const body = await readJsonBody(req);
+      const { name, startingBalance, currency } = body || {};
+      const trimmedName = (name || '').trim();
+      if (!trimmedName) {
+        sendJson(res, 400, { error: 'Game name is required.' });
+        return;
+      }
+      const numericStartingBalance = Number(startingBalance);
+      const balance = Number.isFinite(numericStartingBalance) && numericStartingBalance >= 0
+        ? numericStartingBalance
+        : 1500;
+      const newGame = store.createGame({ name: trimmedName, startingBalance: balance, currency: currency || 'M$' });
+      sendJson(res, 201, { game: newGame });
+    } catch (error) {
+      if (error.message === 'Invalid JSON body.' || error.message === 'Request body too large.') {
+        sendJson(res, 400, { error: error.message });
+      } else {
+        console.error('Create game error:', error);
+        sendJson(res, 500, { error: error.message || 'Failed to create game.' });
+      }
     }
-    res.status(201).json({ game: updatedGame });
-  } catch (error) {
-    res.status(400).json({ error: error.message || 'Failed to add transaction.' });
+    return;
   }
-});
 
-app.use((req, res, next) => {
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'Not found.' });
+  const gameMatch = pathname.match(/^\/api\/games\/([^\/]+)$/);
+  if (gameMatch && req.method === 'GET') {
+    const game = store.getGame(gameMatch[1]);
+    if (!game) {
+      sendJson(res, 404, { error: 'Game not found.' });
+      return;
+    }
+    sendJson(res, 200, { game });
+    return;
   }
-  next();
+
+  const addPlayerMatch = pathname.match(/^\/api\/games\/([^\/]+)\/players$/);
+  if (addPlayerMatch && req.method === 'POST') {
+    try {
+      const body = await readJsonBody(req);
+      const updatedGame = store.addPlayer(addPlayerMatch[1], body || {});
+      if (!updatedGame) {
+        sendJson(res, 404, { error: 'Game not found.' });
+        return;
+      }
+      sendJson(res, 201, { game: updatedGame });
+    } catch (error) {
+      sendJson(res, 400, { error: error.message || 'Failed to add player.' });
+    }
+    return;
+  }
+
+  const addTransactionMatch = pathname.match(/^\/api\/games\/([^\/]+)\/transactions$/);
+  if (addTransactionMatch && req.method === 'POST') {
+    try {
+      const body = await readJsonBody(req);
+      const updatedGame = store.addTransaction(addTransactionMatch[1], body || {});
+      if (!updatedGame) {
+        sendJson(res, 404, { error: 'Game not found.' });
+        return;
+      }
+      sendJson(res, 201, { game: updatedGame });
+    } catch (error) {
+      sendJson(res, 400, { error: error.message || 'Failed to add transaction.' });
+    }
+    return;
+  }
+
+  if (pathname.startsWith('/api/')) {
+    sendJson(res, 404, { error: 'Not found.' });
+    return;
+  }
+
+  await serveStaticFile(res, pathname);
+}
+
+const server = http.createServer((req, res) => {
+  handleRequest(req, res).catch((error) => {
+    console.error('Unhandled error:', error);
+    if (!res.writableEnded) {
+      try {
+        sendJson(res, 500, { error: 'Internal Server Error' });
+      } catch (sendError) {
+        console.error('Failed to send error response:', sendError);
+      }
+    }
+  });
 });
 
-app.get('*', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });

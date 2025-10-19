@@ -10,10 +10,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "nanoid": "^5.0.7"
-  }
+  "license": "MIT"
 }
