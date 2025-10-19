@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Monopoly Money Tracker is a mobile-first ledger that keeps every board-game dollar accounted for with realtime balances, approvals, and audit trails."
+    />
     <title>Monopoly Money Tracker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,10 +20,24 @@
     <header class="site-header">
       <div class="container nav-container">
         <a class="logo" href="#">Monopoly Money Tracker</a>
-        <nav class="nav-links">
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="primary-navigation"
+        >
+          <span class="visually-hidden">Toggle navigation</span>
+          <span class="menu-icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+        <nav id="primary-navigation" class="nav-links">
           <a href="#features">Features</a>
           <a href="#flows">Flows</a>
           <a href="#technology">Technology</a>
+          <a href="#faq">FAQ</a>
           <a href="#contact">Contact</a>
         </nav>
         <button class="cta-button" data-scroll="contact">Request Access</button>
@@ -273,6 +291,49 @@
         </div>
       </section>
 
+      <section id="faq" class="section accent">
+        <div class="container">
+          <div class="section-heading">
+            <span class="badge">Questions</span>
+            <h2>Everything you need to know before the next roll.</h2>
+            <p>
+              Curious how Monopoly Money Tracker fits at your table? Start with
+              these quick answers.
+            </p>
+          </div>
+          <div class="faq-grid">
+            <article class="faq-item">
+              <h3>Does every player need an account?</h3>
+              <p>
+                Nope. Hosts can invite guests with a one-time code that expires
+                when the game wraps, while regulars can create reusable profiles.
+              </p>
+            </article>
+            <article class="faq-item">
+              <h3>Can we play without the internet?</h3>
+              <p>
+                The PWA works offline for short stretches and automatically syncs
+                pending moves once you reconnect to Wi‑Fi or cellular data.
+              </p>
+            </article>
+            <article class="faq-item">
+              <h3>How do approvals work?</h3>
+              <p>
+                Enable banker-only or multi-approver modes. Each request shows
+                before/after balances plus notes so everyone trusts the outcome.
+              </p>
+            </article>
+            <article class="faq-item">
+              <h3>Is there a cost to join?</h3>
+              <p>
+                Monopoly Money Tracker is free for casual play. We may add
+                optional pro analytics later, but the core experience stays free.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
       <section id="contact" class="section accent">
         <div class="container contact">
           <div>
@@ -305,6 +366,7 @@
             ></textarea>
 
             <button type="submit" class="cta-button">Request Early Access</button>
+            <p class="form-status" role="status" hidden>Thanks! We'll be in touch soon.</p>
           </form>
         </div>
       </section>
@@ -316,6 +378,7 @@
         <div class="footer-links">
           <a href="#features">Features</a>
           <a href="#technology">Technology</a>
+          <a href="#faq">FAQ</a>
           <a href="#contact">Contact</a>
         </div>
       </div>
