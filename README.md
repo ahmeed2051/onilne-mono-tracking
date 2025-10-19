@@ -3,7 +3,7 @@
 Monopoly Money Tracker is a digital ledger for in-person Monopoly games. It keeps player balances in sync across devices, streamlines approvals for complex transactions, and provides a trustworthy audit trail so the table never has to pause to count cash again.
 
 ## Project Overview
-- **Core goals:** deliver instant clarity on balances, maintain a fair audit trail, offer low-friction joining, work across devices, and keep updates reliable.
+- **Core goals:** deliver instant clarity on balances, maintain a fair audit trail, offer low-friction joining, work across devices, keep updates reliable, and remain completely free to use with no payments required.
 - **Target platforms:** mobile-first progressive web app with optional native wrappers.
 - **Primary users:** bankers, players, and optional spectators joining via QR code, invite link, or short alphanumeric code.
 

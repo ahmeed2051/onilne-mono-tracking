@@ -6,6 +6,7 @@
 - **Zero-friction join:** Scan QR code or enter 6–8 digit session code to hop in within seconds.
 - **Works everywhere:** Mobile-first PWA with optional native wrappers for stores.
 - **Reliable updates:** Real-time synchronization and push notifications for every meaningful change.
+- **Free to use:** No subscriptions, in-app purchases, or payments required to participate.
 
 ## 2. Must-Have Features (MVP)
 ### Game Creation & Joining
