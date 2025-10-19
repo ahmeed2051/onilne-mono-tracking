@@ -6,10 +6,13 @@ const { randomBytes } = require('crypto');
 const PORT = process.env.PORT || 3000;
 
 function nanoid(size = 10) {
-  return randomBytes(size * 2)
-    .toString('base64url')
-    .replace(/[^a-zA-Z0-9]/g, '')
-    .slice(0, size) || randomBytes(size).toString('hex').slice(0, size);
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const bytes = randomBytes(size);
+  let id = '';
+  for (let i = 0; i < size; i += 1) {
+    id += alphabet[bytes[i] % alphabet.length];
+  }
+  return id;
 }
 
 class GameStore {
