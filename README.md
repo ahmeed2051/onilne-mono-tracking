@@ -24,6 +24,12 @@ Monopoly Money Tracker is a lightweight full-stack demo that helps you host Mono
 
 The backend keeps data in memory, so stopping the server resets the games. This is intentional for demo purposes and keeps the setup simple.
 
+## Deployment & configuration
+- The browser client automatically detects the API base URL. You can override it for hosted deployments in three ways:
+  - Set `window.MONOPOLY_API_BASE` before loading `scripts.js`.
+  - Add `<meta name="monopoly-api-base" content="https://your-api.example.com/api" />` to the page.
+  - Configure the `proxy` field in `package.json`; the frontend now reads this value at runtime (and will append `/api` when necessary) to route API calls when served from static hosting providers that block POST requests.
+
 ## Available Scripts
 - `npm start` – run the Node.js server on port 3000.
 - `npm test` – placeholder script; prints a message and exits.

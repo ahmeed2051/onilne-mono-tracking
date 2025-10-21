@@ -47,15 +47,18 @@ function normalizeApiBase(base) {
   return `/${stripped}`;
 }
 
-function resolveApiBase() {
+function getOverrideApiBase() {
   const override =
     (typeof window !== 'undefined' && window.MONOPOLY_API_BASE) ||
     document.querySelector('meta[name="monopoly-api-base"]')?.getAttribute('content') ||
     document.body?.dataset?.apiBase;
-  if (override) {
-    return normalizeApiBase(override);
+  if (!override) {
+    return null;
   }
+  return normalizeApiBase(override);
+}
 
+function deriveDefaultApiBase() {
   let inferredPath = '';
   try {
     const script = document.currentScript || document.querySelector('script[src*="scripts.js"]');
@@ -83,7 +86,104 @@ function resolveApiBase() {
   return '/api';
 }
 
-const API_BASE = resolveApiBase();
+function coerceProxyToApiBase(value) {
+  if (!value || typeof value !== 'string') return null;
+  const normalized = normalizeApiBase(value);
+  if (/\/api$/i.test(normalized)) {
+    return normalized;
+  }
+  if (/^https?:\/\//i.test(normalized) || normalized.startsWith('//')) {
+    return `${normalized.replace(/\/+$/u, '')}/api`;
+  }
+  if (!normalized || normalized === '/') {
+    return '/api';
+  }
+  return `${normalized.replace(/\/+$/u, '')}/api`;
+}
+
+async function readProxyFromPackageJson() {
+  const candidates = [];
+  const addCandidate = (value) => {
+    if (!value || typeof value !== 'string') return;
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    if (!candidates.includes(trimmed)) {
+      candidates.push(trimmed);
+    }
+  };
+
+  addCandidate('/package.json');
+  addCandidate('package.json');
+
+  if (typeof window !== 'undefined') {
+    const { pathname } = window.location || { pathname: '' };
+    if (pathname) {
+      const basePath = pathname.endsWith('/')
+        ? pathname
+        : pathname.replace(/\/[^/]*$/, '/');
+      if (basePath && basePath !== '/') {
+        addCandidate(`${basePath}package.json`);
+      }
+    }
+  }
+
+  try {
+    const script = document.currentScript || document.querySelector('script[src*="scripts.js"]');
+    if (script) {
+      const scriptUrl = new URL(script.src, window.location.href);
+      const scriptDir = scriptUrl.pathname.replace(/\/[^/]*$/, '/');
+      if (scriptDir && scriptDir !== '/') {
+        addCandidate(`${scriptDir}package.json`);
+      }
+    }
+  } catch (error) {
+    console.warn('Unable to derive package.json path from script reference.', error);
+  }
+
+  for (const candidate of candidates) {
+    try {
+      const response = await fetch(candidate, {
+        headers: { Accept: 'application/json' },
+        cache: 'no-store',
+      });
+      if (!response.ok) {
+        continue;
+      }
+      const packageJson = await response.json();
+      if (packageJson && typeof packageJson.proxy === 'string') {
+        const coerced = coerceProxyToApiBase(packageJson.proxy);
+        if (coerced) {
+          return coerced;
+        }
+      }
+    } catch (error) {
+      console.warn(`Unable to read proxy value from ${candidate}.`, error);
+    }
+  }
+
+  return null;
+}
+
+async function resolveApiBase() {
+  const overrideBase = getOverrideApiBase();
+  if (overrideBase) {
+    return overrideBase;
+  }
+
+  const defaultBase = deriveDefaultApiBase();
+  if (defaultBase && defaultBase !== '/api') {
+    return defaultBase;
+  }
+
+  const proxyBase = await readProxyFromPackageJson();
+  if (proxyBase) {
+    return proxyBase;
+  }
+
+  return defaultBase;
+}
+
+let API_BASE = '/api';
 
 async function apiRequest(path, options = {}) {
   const config = {
@@ -579,4 +679,15 @@ async function init() {
   }
 }
 
-init();
+async function initializeApp() {
+  try {
+    API_BASE = await resolveApiBase();
+  } catch (error) {
+    console.error('Failed to resolve API base, falling back to /api.', error);
+    API_BASE = '/api';
+  }
+  console.info('Monopoly Money Tracker API base:', API_BASE);
+  await init();
+}
+
+initializeApp();
