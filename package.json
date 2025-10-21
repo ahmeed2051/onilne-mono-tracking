@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Full-stack Monopoly money tracking demo application",
   "main": "server.js",
+  "proxy": "http://localhost:3000",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
